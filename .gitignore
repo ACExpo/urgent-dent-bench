@@ -4,3 +4,5 @@ __pycache__/
 .env
 .ipynb_checkpoints/
 results/raw_model_outputs/
+*.egg-info/
+.pytest_cache/

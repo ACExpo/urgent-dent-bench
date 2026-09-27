@@ -1,0 +1,8 @@
+{
+  "counts": {
+    "base": 30,
+    "missing_critical": 30,
+    "counterfactual": 30,
+    "guideline_control": 20
+  }
+}

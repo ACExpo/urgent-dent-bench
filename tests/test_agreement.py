@@ -8,6 +8,7 @@ from urgentdentbench.agreement import (
     gwet_ac1,
     matched_responses,
     observed_agreement,
+    weighted_kappa,
 )
 
 CASE = {
@@ -73,4 +74,21 @@ def test_format_agreement_prints_a_row_per_field():
     rows = agreement_table([CASE], [ann(CASE, urgency="urgent")], [ann(CASE, urgency="urgent")])
     text = format_agreement(rows, 1, "judge.jsonl", "human.jsonl")
     assert "judge.jsonl x human.jsonl: 1 matched" in text
-    assert "| urgency | 1 | 1.00 | n/a | 1.00 |" in text
+    assert "| urgency | 1 | 1.00 | n/a | 1.00 | n/a |" in text
+
+
+def test_weighted_kappa_credits_near_misses_on_ordinal_ratings():
+    a, b = [0, 1, 2, 2], [0, 2, 2, 1]
+    assert weighted_kappa(a, a, (0, 1, 2)) == 1.0
+    assert weighted_kappa(a, b, (0, 1, 2)) > cohen_kappa(a, b, (0, 1, 2))
+    # Hand computation: observed weighted disagreement 0.125, expected 0.34375.
+    assert weighted_kappa(a, b, (0, 1, 2)) == pytest.approx(1 - 0.125 / 0.34375)
+    assert weighted_kappa([], [], (0, 1, 2)) is None
+
+
+def test_weighted_kappa_is_only_reported_for_ratings():
+    first = [ann(CASE, urgency="urgent", ratings={"red_flags": 2})]
+    second = [ann(CASE, urgency="urgent", ratings={"red_flags": 1})]
+    rows = {r["field"]: r for r in agreement_table([CASE], first, second)}
+    assert rows["urgency"]["weighted_kappa"] is None
+    assert rows["ratings.red_flags"]["weighted_kappa"] == pytest.approx(0.0)  # one pair: observed = expected

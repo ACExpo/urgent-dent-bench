@@ -301,6 +301,11 @@ def score_responses(cases, annotations):
     return [score_response(by_id[a["case_id"]], a) for a in annotations]
 
 
+def base_case_id(case):
+    """The BASE case of an anchored case, in the same language (``CR001-CF-PT`` -> ``CR001-BASE-PT``)."""
+    return f"{case['anchor_id']}-BASE" + ("-PT" if case["case_id"].endswith("-PT") else "")
+
+
 def counterfactual_pairs(cases, annotations):
     """Sensitivity results for every BASE/CF pair annotated for the same model and run."""
     by_id = _index(cases, annotations)
@@ -310,7 +315,7 @@ def counterfactual_pairs(cases, annotations):
         cf = by_id[case_id]
         if cf["variant"] != "counterfactual":
             continue
-        base_id = f"{cf['anchor_id']}-BASE"
+        base_id = base_case_id(cf)
         base_annotation = keyed.get((model_id, run_id, base_id))
         if base_annotation is not None:
             result = counterfactual_sensitivity(by_id[base_id], base_annotation, cf, cf_annotation)

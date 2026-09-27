@@ -85,6 +85,7 @@ def validate_dataset(root):
 
     errors += _check_ids_and_counts(rows, release["counts"])
     errors += _check_text(rows)
+    errors += _check_must_not(rows)
     errors += _check_guideline_refs(rows, guideline_ids)
     triplets, triplet_errors = _group_triplets(rows, anchors)
     errors += triplet_errors
@@ -131,6 +132,16 @@ def _check_text(rows):
         for ids in seen.values():
             if len(ids) > 1:
                 errors.append(f"Duplicate {field} text in {ids}")
+    return errors
+
+
+def _check_must_not(rows):
+    errors = []
+    for row in rows:
+        actions = Counter(item["action"].strip().lower() for item in row["must_not"])
+        repeated = sorted(action for action, n in actions.items() if n > 1)
+        if repeated:
+            errors.append(f"{row['case_id']}: must_not repeats actions {repeated}")
     return errors
 
 

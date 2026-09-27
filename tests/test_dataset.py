@@ -52,12 +52,12 @@ def find_case(root, case_id):
     raise KeyError(case_id)
 
 
-def edit_case(root, case_id, **fields):
+def edit_case(root, target, /, **fields):
     """Set (or, with DELETE, remove) fields of one case; return its shard path."""
     for path in shards(root):
         rows = read_rows(path)
         for row in rows:
-            if row["case_id"] == case_id:
+            if row["case_id"] == target:
                 for key, value in fields.items():
                     if value is DELETE:
                         del row[key]
@@ -65,7 +65,7 @@ def edit_case(root, case_id, **fields):
                         row[key] = value
                 write_rows(path, rows)
                 return path
-    raise KeyError(case_id)
+    raise KeyError(target)
 
 
 def remove_case(root, case_id):
@@ -152,11 +152,10 @@ def test_guideline_controls_cannot_have_an_anchor(dataset_copy):
 
 
 def test_rejects_duplicate_ids_across_shards(dataset_copy):
-    first, second, *_ = shards(dataset_copy)
-    rows = read_rows(second)
-    rows[0]["case_id"] = read_rows(first)[0]["case_id"]
-    write_rows(second, rows)
-    assert "Duplicate case IDs" in validation_errors(dataset_copy)
+    first = edit_case(dataset_copy, "GC001")
+    second = edit_case(dataset_copy, "GC011", case_id="GC001")
+    assert first != second
+    assert "Duplicate case IDs: ['GC001']" in validation_errors(dataset_copy)
 
 
 def test_rejects_count_that_differs_from_release(dataset_copy):

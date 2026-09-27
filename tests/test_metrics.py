@@ -9,6 +9,7 @@ from urgentdentbench.metrics import (
     AnnotationError,
     appropriate_abstention,
     check_annotation,
+    counterfactual_pairs,
     counterfactual_sensitivity,
     dimension_scores,
     red_flag_recall,
@@ -368,3 +369,24 @@ def test_cli_reports_invalid_annotations(tmp_path):
     result = run_cli(path, cwd=tmp_path)
     assert result.returncode == 1
     assert "urgency" in result.stderr
+
+
+def test_annotator_is_recorded_as_a_string():
+    check_annotation(BASE, ann(BASE, annotator="human:AC"))
+    with pytest.raises(AnnotationError, match="annotator"):
+        check_annotation(BASE, ann(BASE, annotator=3))
+
+
+def test_counterfactual_pairs_carry_model_run_and_anchor():
+    annotations = [
+        ann(BASE, urgency="emergency"), ann(CF, urgency="urgent"),
+        ann(BASE, model="m2", urgency="urgent"), ann(CF, model="m2", urgency="urgent"),
+    ]
+    pairs = counterfactual_pairs(CASES, annotations)
+    assert [(p["model_id"], p["run_id"], p["anchor_id"], p["passed"]) for p in pairs] == [
+        ("m1", "r1", "CR900", True), ("m2", "r1", "CR900", False)]
+
+
+def test_scores_name_the_bootstrap_cluster():
+    assert score_response(BASE, ann(BASE))["cluster_id"] == "CR900"
+    assert score_response(GC, ann(GC))["cluster_id"] == "GC900"

@@ -4,3 +4,11 @@ __pycache__/
 .env
 .ipynb_checkpoints/
 results/raw_model_outputs/
+results/judge_annotations/
+# Local model weights (downloaded by `udb download`); never commit them
+/models/
+# Hidden test split: kept only on the maintainer's machine; its hash is in data/benchmark/hidden_split.json
+/data/hidden/
+*.gguf
+*.egg-info/
+.pytest_cache/

@@ -4,10 +4,19 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "urgentdentbench"
-version = "1.0.0"
+version = "1.1.0"
 description = "Safety-focused benchmark for AI clinical reasoning in dental urgent care"
 requires-python = ">=3.10"
-dependencies = ["numpy>=2.0","pandas>=2.2","scikit-learn>=1.5","jsonschema>=4.23"]
+dependencies = ["numpy>=2.0","pandas>=2.2","scikit-learn>=1.5","jsonschema>=4.23","pyyaml>=6.0"]
+
+[project.optional-dependencies]
+# Local models for `udb run` / `udb judge`. On Apple Silicon install with Metal:
+#   CMAKE_ARGS="-DGGML_METAL=on" pip install -e ".[local]"
+local = ["llama-cpp-python>=0.3.0", "huggingface_hub>=0.24"]
+dev = ["pytest>=8.0", "flake8>=7.0"]
+
+[project.scripts]
+udb = "urgentdentbench.cli:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]

@@ -119,7 +119,7 @@ Clinical descriptions of injuries, infections and bleeding, as found in any clin
 **What mechanisms or procedures were used?**
 - **Version 1.0.0:** written by the lead investigator.
 - **Version 1.1.0:** vignettes, counterfactual gold, rubrics and the pt-BR translation were redrafted with an AI
-  assistant (Claude) from the source summaries and the investigator's annotations, then checked by the
+  assistant from the source summaries and the investigator's annotations, then checked by the
   automated validator. Every record is marked `draft_ai` until a clinician reviews it (`docs/ANNOTATION_PROTOCOL.md`).
 
 **Over what timeframe was the data collected?**

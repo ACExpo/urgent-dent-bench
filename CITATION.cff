@@ -2,7 +2,7 @@ cff-version: 1.2.0
 message: "If you use UrgentDentBench, please cite this repository."
 title: "UrgentDentBench"
 type: dataset
-version: 1.0.0
+version: 1.1.0
 authors:
   - family-names: "Calazans"
     given-names: "Andreza"
